@@ -42,15 +42,11 @@ void HD44780_SetUpperNibble(unsigned short int data);
 
 void HD44780_SetLowerNibble(unsigned short int data);
 
-void HD44780_ClearUpperNibble();
-
-void HD44780_ClearLowerNibble();
-
 void HD44780_Send4BitsIn4BitMode(unsigned short int data);
 
 void HD44780_Send8BitsIn4BitMode(unsigned short int data);
 
-void HD44780_SendFourBitStartInstruction(unsigned short int data);
+void HD44780_Send4BitStartInstruction(unsigned short int data);
 
 void HD44780_SendInstruction(unsigned short int data);
 

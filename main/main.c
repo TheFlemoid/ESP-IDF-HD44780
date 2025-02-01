@@ -11,16 +11,17 @@ void app_main(void)
 
     HD44780_SendData('F');
     HD44780_SendData('o');
-    HD44780_SendData('u');
+    HD44780_SendData('U');
     HD44780_SendData('r');
     HD44780_SendData(' ');
     HD44780_SendData('B');
     HD44780_SendData('i');
-    HD44780_SendData('t');
+    HD44780_SendData('T');
     HD44780_SendData(' ');
-    HD44780_SendData('M');
-    HD44780_SendData('o');
+    HD44780_SendData('m');
+    HD44780_SendData('O');
     HD44780_SendData('d');
-    HD44780_SendData('e');
+    HD44780_SendData('E');
+    HD44780_SendData('!');
     HD44780_SendData('!');
 }
