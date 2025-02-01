@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "rom/ets_sys.h"
@@ -10,10 +9,64 @@ HD44780_EIGHT_BIT_BUS *eightBus;
 gpio_num_t enablePin;
 gpio_num_t rsPin;
 
-static uint32_t oneMilliDelay = 1 / portTICK_PERIOD_MS;
+static uint32_t ONE_HUNDRED_MILLI_DELAY = (100 / portTICK_PERIOD_MS);
+static uint32_t TWENTY_MILLI_DELAY = (20 / portTICK_PERIOD_MS);
 static uint32_t VOLTAGE_CHANGE_DELAY_US = 5;
 static uint32_t INSTRUCTION_DELAY_US = 100;
 
+/** 
+ * HD44780 init steps for either 8 or 4 bit mode are as follows:
+ * 1. Wait 100ms (actual startup delay is >40ms, but this is only 
+ *    done once so erring on the side of caution.)
+ * 2. Send HD44780_INIT_SEQ (0x30), then delay >4ms.  This is a special
+ *    case of the function set instruction where only the upper nibble
+ *    (D4-D7) is considered by the driver.  Three of these instructions 
+ *    together will cause the driver to reset, which is the goal here.
+ * 3. Send HD44780_INIT_SEQ (0x30) again, then delay >100us.
+ * 4. Send HD44780_INIT_SEQ (0x30) a third time, then delay >100us.
+ *    This will cause the display to do a soft reset.
+ * 5. For 4 bit initialization, send instruction HD44780_FOUR_BIT_MODE
+ *    (0x20) and delay >100us.  This tells the controller that all
+ *    commands going forward are on D4-D7 only, and to ignore D0-3 entirely.
+ *    This is not necessary for 8 bit.
+ * 6. Send the actual function set instruction then wait >50us.  
+ *    The function set instruction is as follows: 
+ *      0b001(DL)(N)(F)00 where:
+ *      - DL is 1 for 8 bit interface, 0 for 4 bit interface
+ *      - N is 0 for one line, or 1 for two line (this is the logical
+ *        number of lines as perceived by the LCD controller, which 
+ *        would still be two for four line displays).
+ *      - F is 0 for 5x8 dot character font, or 1 for 5x10 dot character
+ *        font (this will almost always be 0, or 5x8 font).
+ *      For 8 bit, this will usually be 0x38
+ *      For 4 bit, this will usually be 0x28
+ *      In practice, we OR together the DL, N, and F bitmasks here.
+ * 7. Send HD44780_DISP_OFF and delay >50us.  The lower three bits 
+ *    of this instruction control whether the display itself (D), 
+ *    the cursor(C), and the cursor blink (B) should be on or off, 
+ *    but for now we turn all of them off.
+ * 8. Send HD44780_DISP_CLEAR and delay >3ms.  This clears all 80 DDRAM
+ *    addresses on the display, hence the longer wait time.
+ * 9. Send HD44780_ENTRY_MODE and delay >50us.  The lower two bits of 
+ *    this command control whether the cursor should move (I/D) left 
+ *    to right (1) or right to left (0), and whether the display should 
+ *    shift (S) (1) or not shift (0).  We typically want the cursor to 
+ *    move left to right and for the display to not shift, so 0x06.
+ * 10. The display is not initialized, but it was turned off in step 7,
+ *     so we have to turn it on and set our display mode.
+ * 11. Send HD44780_DISP_ON and delay >50us. Set the lower two bits 
+ *     based on whether the cursor should be on (C) and the cursor 
+ *     should blink (B). For example, sending HD44780_DISP_ON would 
+ *     just turn the display on, HD44780_CUSOR_ON would turn the 
+ *     display on and display the cursor, etc.
+ */
+
+/**
+ * Initializes the param four bit bus, and initialized the display
+ * in four bit mode.
+ * 
+ * @param fourBitBus HD44780_FOUR_BIT_BUS to drive the display
+ */
 void HD44780_InitFourBitBus(HD44780_FOUR_BIT_BUS *fourBitBus) {
     displayMode = HD44780_FOUR_BIT_MODE;
     fourBus = fourBitBus;
@@ -27,12 +80,21 @@ void HD44780_InitFourBitBus(HD44780_FOUR_BIT_BUS *fourBitBus) {
 
     enablePin = fourBitBus->E;
     rsPin = fourBitBus->RS;
+
+    HD44780_InitDisplay();
 }
 
+/**
+ * Initializes the param eight bit bus, and initialized the display
+ * in eight bit mode.
+ * 
+ * @param eightBitBus HD44780_EIGHT_BIT_BUS to drive the display
+ */
 void HD44780_InitEightBitBus(HD44780_EIGHT_BIT_BUS *eightBitBus) {
     displayMode = HD44780_EIGHT_BIT_MODE;
     eightBus = eightBitBus;
 
+    // Set all pins on bus to OUTPUTs
     gpio_set_direction(eightBitBus->D0, GPIO_MODE_OUTPUT);
     gpio_set_direction(eightBitBus->D1, GPIO_MODE_OUTPUT);
     gpio_set_direction(eightBitBus->D2, GPIO_MODE_OUTPUT);
@@ -44,12 +106,46 @@ void HD44780_InitEightBitBus(HD44780_EIGHT_BIT_BUS *eightBitBus) {
     gpio_set_direction(eightBitBus->E, GPIO_MODE_OUTPUT);
     gpio_set_direction(eightBitBus->RS, GPIO_MODE_OUTPUT);
 
+    // Keep E and RS as globals separately to make other functions easier
     enablePin = eightBitBus->E;
     rsPin = eightBitBus->RS;
+
+    HD44780_InitDisplay();
+}
+
+void HD44780_InitDisplay() {
+    // NOTE: The SendInstruction method has a delay built in, but it
+    //       is not long enough for some of the initialization steps.
+    //       That is why some of these commands have a delay after, and
+    //       some don't.
+    vTaskDelay(ONE_HUNDRED_MILLI_DELAY);
+    HD44780_SendFourBitStartInstruction(HD44780_INIT_SEQ);
+    vTaskDelay(TWENTY_MILLI_DELAY);
+    HD44780_SendFourBitStartInstruction(HD44780_INIT_SEQ);
+    vTaskDelay(TWENTY_MILLI_DELAY);
+    HD44780_SendFourBitStartInstruction(HD44780_INIT_SEQ);
+    vTaskDelay(TWENTY_MILLI_DELAY);
+
+    // TODO: FLD 01FEB25 - Assuming here that all displays are two row and 5x8
+    //                     add support for one row and 5x10 displays later.
+    if (displayMode == HD44780_FOUR_BIT_MODE) {
+        HD44780_SendFourBitStartInstruction(HD44780_FOUR_BIT_MODE);
+        HD44780_SendInstruction(HD44780_FOUR_BIT_MODE | HD44780_TWO_ROWS | 
+                                HD44780_FONT_5X8);
+    } else {
+        HD44780_SendInstruction(HD44780_EIGHT_BIT_MODE | HD44780_TWO_ROWS | 
+                                HD44780_FONT_5X8);
+    }
+
+    HD44780_SendInstruction(HD44780_DISP_OFF);
+    HD44780_SendInstruction(HD44780_DISP_CLEAR);
+    vTaskDelay(TWENTY_MILLI_DELAY);
+    HD44780_SendInstruction(HD44780_ENTRY_MODE);
+    HD44780_SendInstruction(HD44780_DISP_ON);
 }
 
 /**
- * Pulses the 'E' clock pin on param HD44780_FOUR_BIT_BUS
+ * Pulses the 'E' clock pin
  */
 void HD44780_Pulse_E() {
     gpio_set_level(enablePin, 1);
@@ -83,16 +179,11 @@ void HD44780_SetUpperNibble(unsigned short int data) {
         D4 = fourBus->D4;
     }
 
-    printf("In SetUpperNibble, data received is %d : %04x\n", data, data);
     // Set D4-D7 if corresponding bit is set in the data
     gpio_set_level(D7, (data & 0x80));
-    printf("Setting D7 to %d\n", (data & 0x80));
     gpio_set_level(D6, (data & 0x40));
-    printf("Setting D6 to %d\n", (data & 0x40));
     gpio_set_level(D5, (data & 0x20));
-    printf("Setting D5 to %d\n", (data & 0x20));
     gpio_set_level(D4, (data & 0x10));
-    printf("Setting D4 to %d\n", (data & 0x10));
 
     ets_delay_us(VOLTAGE_CHANGE_DELAY_US);
 }
@@ -102,16 +193,11 @@ void HD44780_SetLowerNibble(unsigned short data) {
         return;
     }
 
-    printf("In SetLowerNibble, data received is %d : %04x\n", data, data);
 
     gpio_set_level(eightBus->D3, (data & 0x08));
-    printf("Setting D3 to %d\n", (data & 0x08));
     gpio_set_level(eightBus->D2, (data & 0x04));
-    printf("Setting D2 to %d\n", (data & 0x04));
     gpio_set_level(eightBus->D1, (data & 0x02));
-    printf("Setting D1 to %d\n", (data & 0x02));
     gpio_set_level(eightBus->D0, (data & 0x01));
-    printf("Setting D0 to %d\n", (data & 0x01));
 
     ets_delay_us(VOLTAGE_CHANGE_DELAY_US);
 }
@@ -218,10 +304,8 @@ void HD44780_SendInstruction(unsigned short int data) {
     gpio_set_level(rsPin, 0);
 
     if (displayMode == HD44780_FOUR_BIT_MODE) {
-        printf("Sending instruction in 4 bit mode.\n");
         HD44780_Send8BitsIn4BitMode(data);
     } else {
-        printf("Sending instruction in 8 bit mode.\n");
         HD44780_Send8BitsIn8BitMode(data);
     }
 }
