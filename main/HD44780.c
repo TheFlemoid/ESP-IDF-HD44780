@@ -1,3 +1,4 @@
+#include <string.h>
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "rom/ets_sys.h"
@@ -67,7 +68,7 @@ static uint32_t INSTRUCTION_DELAY_US = 100;
  * 
  * @param fourBitBus HD44780_FOUR_BIT_BUS to drive the display
  */
-void HD44780_InitFourBitBus(HD44780_FOUR_BIT_BUS *fourBitBus) {
+void HD44780_initFourBitBus(HD44780_FOUR_BIT_BUS *fourBitBus) {
     displayMode = HD44780_FOUR_BIT_MODE;
     fourBus = fourBitBus;
 
@@ -90,7 +91,7 @@ void HD44780_InitFourBitBus(HD44780_FOUR_BIT_BUS *fourBitBus) {
  * 
  * @param eightBitBus HD44780_EIGHT_BIT_BUS to drive the display
  */
-void HD44780_InitEightBitBus(HD44780_EIGHT_BIT_BUS *eightBitBus) {
+void HD44780_initEightBitBus(HD44780_EIGHT_BIT_BUS *eightBitBus) {
     displayMode = HD44780_EIGHT_BIT_MODE;
     eightBus = eightBitBus;
 
@@ -141,6 +142,95 @@ void HD44780_InitDisplay() {
     HD44780_SendInstruction(HD44780_DISP_CLEAR);
     vTaskDelay(TWENTY_MILLI_DELAY);
     HD44780_SendInstruction(HD44780_ENTRY_MODE);
+    HD44780_SendInstruction(HD44780_DISP_ON);
+}
+
+/**
+ * Prints the param string to the display
+ * NOTE: This function does not check to see if the string will fit in the
+ *       visible area of the display. It is expected that the calling 
+ *       function takes care of that.
+ * 
+ * @param data String to draw on the display as a character array
+ */
+void HD44780_print(char* data) {
+    int length = strlen(data);
+    for(int i = 0; i < length; i++) {
+        HD44780_SendData(data[i]);
+    }
+}
+
+/**
+ * Prints the param character to the display
+ */
+void HD44780_write(char data) {
+    HD44780_SendData(data);
+}
+
+/**
+ * Clears the entire display and sets the cursor back to 0, 0
+ * NOTE: This instruction has two write to all DDRAM registers on the HD44780,
+ *       so the delay is quite a bit longer then most other instructions.
+ */
+void HD44780_clear() {
+    HD44780_SendInstruction(HD44780_DISP_CLEAR);
+    vTaskDelay(TWENTY_MILLI_DELAY);
+}
+
+/**
+ * Sets the position of the cursor back to home (0, 0).
+ */
+void HD44780_homeCursor() {
+    HD44780_setCursorPos(0, 0);
+}
+
+/**
+ * Sets the position of the cursor based on the param column (x) and row (y)
+ * NOTE: This currently only works for common 16x2 displays
+ * 
+ * @param x column to set cursor to as an integer
+ * @param y row to set cursor to as an integer
+ */
+void HD44780_setCursorPos(int x, int y) {
+    // If position is out of range for display, just return
+    if (x < 0 || y < 0 || x > HD44780_COLS || y > HD44780_ROWS) {
+        return;
+    }
+
+    // Set cursor based on row
+    if (y == 0) {
+        HD44780_SendInstruction(HD44780_SET_POSITION | (HD44780_ROW1_START + x));
+    } else if (y == 1) {
+        HD44780_SendInstruction(HD44780_SET_POSITION | (HD44780_ROW2_START + x));
+    }
+}
+
+/**
+ * Turns on the character cursor and sets it to blinking mode
+ */
+void HD44780_blink() {
+    HD44780_SendInstruction(HD44780_CURSOR_BLINK);
+}
+
+/**
+ * Turns on the character cursor and sets it to non blinking mode
+ */
+void HD44780_noBlink() {
+    HD44780_SendInstruction(HD44780_CURSOR_ON);
+}
+
+/**
+ * Turns on the character cursor and sets it to non blinking mode
+ * NOTE: Functionally this is the same as HD445780_noBlink()
+ */
+void HD44780_cursor() {
+    HD44780_SendInstruction(HD44780_CURSOR_ON);
+}
+
+/**
+ * Turns off the character cursor
+ */
+void HD44780_noCursor() {
     HD44780_SendInstruction(HD44780_DISP_ON);
 }
 

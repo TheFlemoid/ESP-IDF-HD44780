@@ -29,11 +29,7 @@ typedef struct _eightBitBus {
     gpio_num_t E;
 } HD44780_EIGHT_BIT_BUS;
 
-// Method declarations
-void HD44780_InitFourBitBus(HD44780_FOUR_BIT_BUS *bus);
-
-void HD44780_InitEightBitBus(HD44780_EIGHT_BIT_BUS *bus);
-
+// 'Private' methods designed for internal use
 void HD44780_InitDisplay();
 
 void HD44780_Pulse_E();
@@ -52,6 +48,30 @@ void HD44780_SendInstruction(unsigned short int data);
 
 void HD44780_SendData(unsigned short int data);
 
+
+// Public methods designed for the user to call
+void HD44780_initFourBitBus(HD44780_FOUR_BIT_BUS *bus);
+
+void HD44780_initEightBitBus(HD44780_EIGHT_BIT_BUS *bus);
+
+void HD44780_print(char* data);
+
+void HD44780_write(char data);
+
+void HD44780_clear();
+
+void HD44780_setCursorPos(int col, int row);
+
+void HD44780_homeCursor();
+
+void HD44780_blink();
+
+void HD44780_noBlink();
+
+void HD44780_cursor();
+
+void HD44780_noCursor();
+
 // HD44780 Instruction Definitions
 #define HD44780_INIT_SEQ        0x30
 #define HD44780_DISP_CLEAR      0x01
@@ -63,8 +83,19 @@ void HD44780_SendData(unsigned short int data);
 #define HD44780_ENTRY_MODE      0x06
 #define HD44780_FOUR_BIT_MODE   0x20
 #define HD44780_EIGHT_BIT_MODE  0x30
+#define HD44780_SET_POSITION    0x80
 
 // Bitmasks for various instructions
 #define HD44780_TWO_ROWS        0x08
 #define HD44780_FONT_5X8        0x00
 #define HD44780_FONT_5X10       0x40
+
+// Constants for calculations
+// TODO: FLD 03FEB25 - Currently only support common 2x16 LCDs, as that's all I have
+//       to test with. If, later, we want to support more varied displays, will have
+//       to have a way of defining which one you're using, and pad out the methods
+//       using the constants below (setCursor, shift, etc).
+#define HD44780_ROW1_START      0x00
+#define HD44780_ROW2_START      0x40
+#define HD44780_ROWS            2
+#define HD44780_COLS            16
