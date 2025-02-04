@@ -6,6 +6,10 @@ Work in progress.
 
 ---
 
+<p align="center">
+    <img src="./lcd_test.gif" alt="Test Display Example"/>
+</p>
+
 Usage of this library is incredibly simple.  First you have to pick your mode of operation.
 
 HD44780 displays are typically driven in one of three modes:
