@@ -64,6 +64,10 @@ void HD44780_setCursorPos(int col, int row);
 
 void HD44780_homeCursor();
 
+void HD44780_shiftDispLeft();
+
+void HD44780_shiftDispRight();
+
 void HD44780_blink();
 
 void HD44780_noBlink();
@@ -84,6 +88,8 @@ void HD44780_noCursor();
 #define HD44780_FOUR_BIT_MODE   0x20
 #define HD44780_EIGHT_BIT_MODE  0x30
 #define HD44780_SET_POSITION    0x80
+#define HD44780_SHIFT_RIGHT     0x1C
+#define HD44780_SHIFT_LEFT      0x18
 
 // Bitmasks for various instructions
 #define HD44780_TWO_ROWS        0x08

@@ -31,7 +31,7 @@ HD44780 init steps for either 8 or 4 bit mode are as follows:
 6. Send the actual function set instruction then wait >50us.  
    The function set instruction is as follows: 
      0b001(DL)(N)(F)00 where:
-     - DL is 1 for 8 bit interface, 0 for 4 bit interface
+     - DL is 1 for 8-bit mode or 0 for 4-bit mode
      - N is 0 for one line, or 1 for two line (this is the logical
        number of lines as perceived by the LCD controller, which 
        would still be two for four line displays).

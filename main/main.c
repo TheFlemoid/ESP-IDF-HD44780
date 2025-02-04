@@ -13,6 +13,29 @@ void app_main(void)
     HD44780_setCursorPos(6,1);
     HD44780_print("test");
 
+    const uint32_t shiftDelay = 500 / portTICK_PERIOD_MS;
+
+    for (int i = 0; i < 4; i++) {
+        HD44780_shiftDispRight();
+        vTaskDelay(shiftDelay);
+    }
+
+    for (int i = 0; i < 7; i++) {
+        HD44780_shiftDispLeft();
+        vTaskDelay(shiftDelay);
+    }
+
+    while (true) {
+        for (int i = 0; i < 7; i++) {
+            HD44780_shiftDispRight();
+            vTaskDelay(shiftDelay);
+        }
+
+        for (int i = 0; i < 7; i++) {
+            HD44780_shiftDispLeft();
+            vTaskDelay(shiftDelay);
+        }
+    }
     //bool pattern = false;
 
     //while (true) {
