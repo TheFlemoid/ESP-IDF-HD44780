@@ -4,7 +4,9 @@ Currently supports HD44780 in either 8 bit and 4 bit mode.
 
 Work in progress.
 
-##HD44780 Initialization:
+---
+
+## HD44780 Initialization:
 HD44780 init steps for either 8 or 4 bit mode are as follows:
 1. Wait 100ms (actual startup delay is >40ms, but this is only 
    done once so erring on the side of caution.)
