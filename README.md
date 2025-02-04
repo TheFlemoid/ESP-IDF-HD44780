@@ -12,7 +12,7 @@ Work in progress.
 
 Usage of this library is incredibly simple.  First you have to pick your mode of operation.
 
-HD44780 displays are typically driven in one of three modes:
+HD44780 displays are driven in one of three modes:
  - **8-bit mode:** This is the standard way that these displays have been driven for decades.  All 8 bits of the
    bus are utilized for communications with the LCD driver.  This has numerous obvious disadvantages, most
    especially that no less then 10 (and sometimes 11) GPIOs are required to drive a simple display.  Regardless,
