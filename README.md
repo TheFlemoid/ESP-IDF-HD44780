@@ -6,6 +6,30 @@ Work in progress.
 
 ---
 
+Usage of this library is incredibly simple.  First you have to pick your mode of operation.
+
+HD44780 displays are typically driven in one of three modes:
+ - 8-bit mode: This is the standard way that these displays have been driven for decades.  All 8 bits of the
+   bus are utilized for communications with the LCD driver.  This has numerous obvious disadvantages, most
+   especially that no less then 10 (and sometimes 11) GPIOs are required to drive a simple display.  Regardless,
+   if you want to drive a display in 8-bit mode for some (presumably legacy) reason, this library fully 
+   supports that use case, we've got you covered.
+ - 4-bit mode: This is one of the two 'modern' ways of driving this type of display.  4-bit mode is supported
+   by the HD44780 LCD controller locally (with no external circuitry), and can achieve all of the features that 
+   8-bit mode can achieve with almost half the pins (usually 6 pins, sometimes 7).  The only requirement is that
+   the MCU driving the display is "fast", when compared to the HD44780 controller design from the 80s, an easy
+   bar to hurdle.
+ - I2C mode: This is a ***relatively*** new method of controlling these displays, and it is the most common method
+   of display control that you'll see in modern drivers.  This method relies on an external I2C driver, which is
+   typically shipped  with character LCDs of this variety in the modern day.  Most HD44780 drivers you see around
+   GitHub today are for displays of this variety.  I am not currently actively supporting this type of display control,
+   since I mostly wrote this in preparation for a different project (in which I was using an HD44780 in 4-bit mode), 
+   and since I don't actually have any of these new displays to test with.  If this erks you and you would like to use
+   this library with an I2C character LCD, please drop an issue on this repo and I'll look into adding support for such
+   a thing.
+
+---
+
 ## HD44780 Initialization:
 Initializing the HD44780 controller is a little tricky, as the datasheet is somewhat
 obtuse about the process and there are two modes that the controller
