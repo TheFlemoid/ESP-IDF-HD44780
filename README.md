@@ -26,11 +26,13 @@ HD44780 displays are typically driven in one of three modes:
  - I2C mode: This is a ***relatively*** new method of controlling these displays, and it is the most common method
    of display control that you'll see in modern drivers.  This method relies on an external I2C driver, which is
    typically shipped  with character LCDs of this variety in the modern day.  Most HD44780 drivers you see around
-   GitHub today are for displays of this variety.  I am not currently actively supporting this type of display control,
-   since I mostly wrote this in preparation for a different project (in which I was using an HD44780 in 4-bit mode), 
-   and since I don't actually have any of these new displays to test with.  If this erks you and you would like to use
-   this library with an I2C character LCD, please drop an issue on this repo and I'll look into adding support for such
-   a thing.
+   GitHub today are for displays of this variety.  Advantages of this mode are obvious, you only need two pins 
+   (SCL and SDA) to support any number of display/I2C devices.  And, with any modern type of MCU, you can drive
+   the I2C bus faster then you could in 8-bit mode parallel operation in the 90s.  I am not currently actively 
+   supporting I2C display control, since I mostly wrote this in preparation for a different project (in which I was 
+   using an HD44780 in 4-bit mode), and since I don't actually have any of these new displays to test with.  If this 
+   erks you and you would like to use this library with an I2C character LCD, please drop an issue on this repo and 
+   I'll look into adding support for such a thing.
 
 ---
 
@@ -52,7 +54,7 @@ HD44780 init steps for either 8 or 4 bit mode are as follows:
 3. Send HD44780_INIT_SEQ (0x30) again, then delay >100us.
 4. Send HD44780_INIT_SEQ (0x30) a third time, then delay >100us.
    This will cause the display to do a soft reset.
-5. For 4 bit initialization, send instruction HD44780_FOUR_BIT_MODE
+5. For 4-bit mode initialization, send instruction HD44780_FOUR_BIT_MODE
    (0x20) and delay >100us.  This tells the controller that all
    commands going forward are on D4-D7 only, and to ignore D0-3 entirely.
    This step should be skipped altogether for 8-bit mode.
