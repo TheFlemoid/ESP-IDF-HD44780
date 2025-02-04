@@ -62,6 +62,9 @@ static uint32_t INSTRUCTION_DELAY_US = 100;
  *     display on and display the cursor, etc.
  */
 
+
+// 'Public' functions, designed for use by the main application
+
 /**
  * Initializes the param four bit bus, and initialized the display
  * in four bit mode.
@@ -112,37 +115,6 @@ void HD44780_initEightBitBus(HD44780_EIGHT_BIT_BUS *eightBitBus) {
     rsPin = eightBitBus->RS;
 
     HD44780_InitDisplay();
-}
-
-void HD44780_InitDisplay() {
-    // NOTE: The SendInstruction method has a delay built in, but it
-    //       is not long enough for some of the initialization steps.
-    //       That is why some of these commands have a delay after, and
-    //       some don't.
-    vTaskDelay(ONE_HUNDRED_MILLI_DELAY);
-    HD44780_Send4BitStartInstruction(HD44780_INIT_SEQ);
-    vTaskDelay(TWENTY_MILLI_DELAY);
-    HD44780_Send4BitStartInstruction(HD44780_INIT_SEQ);
-    vTaskDelay(TWENTY_MILLI_DELAY);
-    HD44780_Send4BitStartInstruction(HD44780_INIT_SEQ);
-    vTaskDelay(TWENTY_MILLI_DELAY);
-
-    // TODO: FLD 01FEB25 - Assuming here that all displays are two row and 5x8
-    //                     add support for one row and 5x10 displays later.
-    if (displayMode == HD44780_FOUR_BIT_MODE) {
-        HD44780_Send4BitStartInstruction(HD44780_FOUR_BIT_MODE);
-        HD44780_SendInstruction(HD44780_FOUR_BIT_MODE | HD44780_TWO_ROWS | 
-                                HD44780_FONT_5X8);
-    } else {
-        HD44780_SendInstruction(HD44780_EIGHT_BIT_MODE | HD44780_TWO_ROWS | 
-                                HD44780_FONT_5X8);
-    }
-
-    HD44780_SendInstruction(HD44780_DISP_OFF);
-    HD44780_SendInstruction(HD44780_DISP_CLEAR);
-    vTaskDelay(TWENTY_MILLI_DELAY);
-    HD44780_SendInstruction(HD44780_ENTRY_MODE);
-    HD44780_SendInstruction(HD44780_DISP_ON);
 }
 
 /**
@@ -231,6 +203,44 @@ void HD44780_cursor() {
  * Turns off the character cursor
  */
 void HD44780_noCursor() {
+    HD44780_SendInstruction(HD44780_DISP_ON);
+}
+
+
+// 'Private' functions designed for internal use
+
+/**
+ * Initializes the HD44780 character LCD in either 4 bit or 8 bit mode
+ * depending on the value of the displayMode global enum.
+ */
+void HD44780_InitDisplay() {
+    // NOTE: The SendInstruction method has a delay built in, but it
+    //       is not long enough for some of the initialization steps.
+    //       That is why some of these commands have a delay after, and
+    //       some don't.
+    vTaskDelay(ONE_HUNDRED_MILLI_DELAY);
+    HD44780_Send4BitStartInstruction(HD44780_INIT_SEQ);
+    vTaskDelay(TWENTY_MILLI_DELAY);
+    HD44780_Send4BitStartInstruction(HD44780_INIT_SEQ);
+    vTaskDelay(TWENTY_MILLI_DELAY);
+    HD44780_Send4BitStartInstruction(HD44780_INIT_SEQ);
+    vTaskDelay(TWENTY_MILLI_DELAY);
+
+    // TODO: FLD 01FEB25 - Assuming here that all displays are two row and 5x8
+    //                     add support for one row and 5x10 displays later.
+    if (displayMode == HD44780_FOUR_BIT_MODE) {
+        HD44780_Send4BitStartInstruction(HD44780_FOUR_BIT_MODE);
+        HD44780_SendInstruction(HD44780_FOUR_BIT_MODE | HD44780_TWO_ROWS | 
+                                HD44780_FONT_5X8);
+    } else {
+        HD44780_SendInstruction(HD44780_EIGHT_BIT_MODE | HD44780_TWO_ROWS | 
+                                HD44780_FONT_5X8);
+    }
+
+    HD44780_SendInstruction(HD44780_DISP_OFF);
+    HD44780_SendInstruction(HD44780_DISP_CLEAR);
+    vTaskDelay(TWENTY_MILLI_DELAY);
+    HD44780_SendInstruction(HD44780_ENTRY_MODE);
     HD44780_SendInstruction(HD44780_DISP_ON);
 }
 
