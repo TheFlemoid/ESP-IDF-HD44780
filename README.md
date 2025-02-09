@@ -40,7 +40,7 @@ HD44780 displays are driven in one of three modes:
 Initializing the HD44780 controller is a little tricky, as the datasheet is somewhat
 obtuse about the process and there are two modes that the controller
 can be initialized to (4-bit and 8-bit mode).  Outside of the 
-[HD44780 datasheet](https://cdn.sparkfun.com/assets/9/5/f/7/b/HD44780.pdf) 
+[HD44780 datasheet](resources/HD44780.pdf) 
 (pdf warning) I got the information to initialize the display from an [Alfred State
 College blog](https://web.alfredstate.edu/faculty/weimandn/lcd/lcd_initialization/lcd_initialization_index.html).
 
