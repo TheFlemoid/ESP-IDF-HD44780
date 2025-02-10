@@ -291,6 +291,13 @@ void HD44780_SetUpperNibble(unsigned short int data) {
     ets_delay_us(VOLTAGE_CHANGE_DELAY_US);
 }
 
+/**
+ * Sets the lower four bits on the bus (D0-D3)
+ * NOTE: If the display is not set for eight bit mode, this function
+ *       will just return
+ * 
+ * @param data byte containing the 4 LSB to send
+ */
 void HD44780_SetLowerNibble(unsigned short data) {
     if (displayMode != HD44780_EIGHT_BIT_MODE) {
         return;

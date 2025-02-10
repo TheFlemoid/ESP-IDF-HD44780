@@ -3,8 +3,7 @@
 
 void app_main(void)
 {
-    HD44780_FOUR_BIT_BUS bus = { GPIO_NUM_18, GPIO_NUM_19, GPIO_NUM_21, GPIO_NUM_22, 
-                                 GPIO_NUM_16, GPIO_NUM_17 };
+    HD44780_FOUR_BIT_BUS bus = { 18, 19, 21, 22, 16, 17 }; 
 
     HD44780_initFourBitBus(&bus);
 
