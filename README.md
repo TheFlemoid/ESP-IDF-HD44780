@@ -36,24 +36,24 @@ HD44780 displays are driven in one of three modes:
 
 Once you've determined the display mode you want, you need to make a struct specific to that mode to initialize the display.  For 4-bit mode, create an HD44780_FOUR_BIT_BUS or for 8-bit mode, create an HD44780_EIGHT_BIT_BUS struct.  The structs are as follows:
 * HD44870_FOUR_BIT_BUS has six parameters
-** 1: GPIO pin number connected to D4
-** 2: GPIO pin number connected to D5
-** 3: GPIO pin number connected to D6
-** 4: GPIO pin number connected to D7
-** 5: GPIO pin number connected to RS
-** 5: GPIO pin number connected to E
+ * 1: GPIO pin number connected to D4
+ * 2: GPIO pin number connected to D5
+ * 3: GPIO pin number connected to D6
+ * 4: GPIO pin number connected to D7
+ * 5: GPIO pin number connected to RS
+ * 6: GPIO pin number connected to E
 
 * HD44870_EIGHT_BIT_BUS has ten parameters
-** 1: GPIO pin number connected to D0
-** 2: GPIO pin number connected to D1
-** 3: GPIO pin number connected to D2
-** 4: GPIO pin number connected to D3
-** 5: GPIO pin number connected to D4
-** 6: GPIO pin number connected to D5
-** 7: GPIO pin number connected to D6
-** 8: GPIO pin number connected to D7
-** 9: GPIO pin number connected to RS
-** 10: GPIO pin number connected to E
+ * 1: GPIO pin number connected to D0
+ * 2: GPIO pin number connected to D1
+ * 3: GPIO pin number connected to D2
+ * 4: GPIO pin number connected to D3
+ * 5: GPIO pin number connected to D4
+ * 6: GPIO pin number connected to D5
+ * 7: GPIO pin number connected to D6
+ * 8: GPIO pin number connected to D7
+ * 9: GPIO pin number connected to RS
+ * 10: GPIO pin number connected to E
 ---
 
 ## HD44780 Initialization:
