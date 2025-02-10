@@ -56,13 +56,15 @@ void HD44780_initEightBitBus(HD44780_EIGHT_BIT_BUS *bus);
 
 void HD44780_print(char* data);
 
-void HD44780_write(char data);
-
 void HD44780_clear();
 
 void HD44780_setCursorPos(int col, int row);
 
 void HD44780_homeCursor();
+
+void HD44780_createChar(int slot, uint8_t* data);
+
+void HD44780_writeChar(int slot);
 
 void HD44780_shiftDispLeft();
 
@@ -75,6 +77,10 @@ void HD44780_noBlink();
 void HD44780_cursor();
 
 void HD44780_noCursor();
+
+void HD44780_dispOff();
+
+void HD44780_dispOn();
 
 // HD44780 Instruction Definitions
 #define HD44780_INIT_SEQ        0x30
@@ -103,5 +109,6 @@ void HD44780_noCursor();
 //       using the constants below (setCursor, shift, etc).
 #define HD44780_ROW1_START      0x00
 #define HD44780_ROW2_START      0x40
+#define HD44780_CGRAM_START     0x40
 #define HD44780_ROWS            2
 #define HD44780_COLS            16

@@ -8,10 +8,37 @@ void app_main(void)
 
     HD44780_initFourBitBus(&bus);
 
+    uint8_t smileyChar[8] = {
+        0b00000,
+        0b01010,
+        0b01010,
+        0b00000,
+        0b10001,
+        0b10001,
+        0b01110,
+        0b00000
+    };
+
+    uint8_t invertSmileyChar[8] = {
+        0b11111,
+        0b10101,
+        0b10101,
+        0b11111,
+        0b01110,
+        0b01110,
+        0b10001,
+        0b11111
+    };
+    
+    HD44780_createChar(0, smileyChar);
+    HD44780_createChar(1, invertSmileyChar);
+
     HD44780_setCursorPos(3,0);
     HD44780_print("This is a");
-    HD44780_setCursorPos(6,1);
-    HD44780_print("test");
+    HD44780_setCursorPos(3,1);
+    HD44780_writeChar(0);
+    HD44780_print("  test ");
+    HD44780_writeChar(1);
 
     const uint32_t shiftDelay = 500 / portTICK_PERIOD_MS;
 

@@ -7,7 +7,7 @@ Work in progress.
 ---
 
 <p align="center">
-    <img src="./lcd_test.gif" alt="Test Display Example"/>
+    <img src="./resources/lcd_test.gif" alt="Test Display Example"/>
 </p>
 
 Usage of this library is incredibly simple.  First you have to pick your mode of operation.
@@ -20,14 +20,14 @@ HD44780 displays are driven in one of three modes:
    supports that use case, we've got you covered.
  - **4-bit mode:** This is one of the two 'modern' ways of driving this type of display.  4-bit mode is supported
    by the HD44780 LCD controller locally (with no external circuitry), and can achieve all of the features that 
-   8-bit mode can achieve with almost half the pins (usually 6 pins, sometimes 7).  The only requirement is that
-   the MCU driving the display is "fast", when compared to the HD44780 controller design from the 80s, an easy
+   8-bit mode can achieve with almost half the pins (usually 6 pins).  The only requirement is that the MCU 
+   driving the display is "fast", when compared to the HD44780 controller design from the 80s, an easy
    bar to hurdle.
  - **I2C mode:** This is a ***relatively*** new method of controlling these displays, and it is the most common method
    of display control that you'll see in modern drivers.  This method relies on an external I2C driver, which is
    typically shipped  with character LCDs of this variety in the modern day.  Most HD44780 drivers you see around
    GitHub today are for displays of this variety.  Advantages of this mode are obvious, you only need two pins 
-   (SCL and SDA) to support any number of display/I2C devices.  And, with any modern type of MCU, you can drive
+   (SCL and SDA) to support any number of displays/I2C devices.  And, with any modern type of MCU, you can drive
    the I2C bus faster then you could in 8-bit mode parallel operation in the 90s.  I am not currently actively 
    supporting I2C display control, since I mostly wrote this in preparation for a different project (in which I was 
    using an HD44780 in 4-bit mode), and since I don't actually have any of these new displays to test with.  If this 
@@ -57,7 +57,7 @@ HD44780 init steps for either 8 or 4 bit mode are as follows:
 5. For 4-bit mode initialization, send instruction HD44780_FOUR_BIT_MODE
    (0x20) and delay >100us.  This tells the controller that all
    commands going forward are on D4-D7 only, and to ignore D0-3 entirely.
-   This step should be skipped altogether for 8-bit mode.
+   This step should be skipped for 8-bit mode operation.
 6. Send the actual function set instruction then wait >50us.  
    The function set instruction is as follows: 
      0b001(DL)(N)(F)00 where:

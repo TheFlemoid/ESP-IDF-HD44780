@@ -18,7 +18,7 @@ static uint32_t INSTRUCTION_DELAY_US = 70;
 // 'Public' functions, designed for use by the main application
 
 /**
- * Initializes the param four bit bus, and initialized the display
+ * Initializes the param four bit bus, and initializes the display
  * in four bit mode.
  * 
  * @param fourBitBus HD44780_FOUR_BIT_BUS to drive the display
@@ -41,7 +41,7 @@ void HD44780_initFourBitBus(HD44780_FOUR_BIT_BUS *fourBitBus) {
 }
 
 /**
- * Initializes the param eight bit bus, and initialized the display
+ * Initializes the param eight bit bus, and initializes the display
  * in eight bit mode.
  * 
  * @param eightBitBus HD44780_EIGHT_BIT_BUS to drive the display
@@ -85,13 +85,6 @@ void HD44780_print(char* data) {
 }
 
 /**
- * Prints the param character to the display
- */
-void HD44780_write(char data) {
-    HD44780_SendData(data);
-}
-
-/**
  * Clears the entire display and sets the cursor back to 0, 0
  * NOTE: This instruction has two write to all DDRAM registers on the HD44780,
  *       so the delay is quite a bit longer then most other instructions.
@@ -108,10 +101,45 @@ void HD44780_homeCursor() {
     HD44780_setCursorPos(0, 0);
 }
 
+/**
+ * Creates a custom character at the param char slot, comprised of
+ * the param data.  Up to eight custom characters can be held in
+ * memory, with slots numbered 0-7.
+ * 
+ * @param slot Integer 0-7 of which "slot" of CGRAM to store the character in
+ * @param data 
+ */
+void HD44780_createChar(int slot, uint8_t* data) {
+    if (slot < 8) {
+        HD44780_SendInstruction(HD44780_CGRAM_START + (slot * 8));
+        for (int i = 0; i < 8; i++) {
+            HD44780_SendData(data[i]);
+        }
+    }
+}
+
+/**
+ * Prints the custom character held in the param char slot
+ * 
+ * @param slot Integer 0-7 of which "slot" of CGRAM the character to print is 
+ *             stored in
+ */
+void HD44780_writeChar(int slot) {
+    if (slot < 8) {
+        HD44780_SendData(slot);
+    }
+}
+
+/**
+ * Shifts all characters in the display one space to the left
+ */
 void HD44780_shiftDispLeft() {
     HD44780_SendInstruction(HD44780_SHIFT_LEFT);
 }
 
+/**
+ * Shifts all characters in the display one space to the right
+ */
 void HD44780_shiftDispRight() {
     HD44780_SendInstruction(HD44780_SHIFT_RIGHT);
 }
@@ -163,6 +191,23 @@ void HD44780_cursor() {
  * Turns off the character cursor
  */
 void HD44780_noCursor() {
+    HD44780_SendInstruction(HD44780_DISP_ON);
+}
+
+/**
+ * Turns the display off entirely.
+ * NOTE: As this library does not control the backlight, it is expected
+ *       that toggling the backlight on/off is handled by the main application.
+ */
+void HD44780_dispOff() {
+    HD44780_SendInstruction(HD44780_DISP_OFF);
+}
+
+/**
+ * Turns the display on.
+ * NOTE: Functionally this is the same as HD44780_noCursor()
+ */
+void HD44780_dispOn() {
     HD44780_SendInstruction(HD44780_DISP_ON);
 }
 
