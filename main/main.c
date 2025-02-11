@@ -1,56 +1,84 @@
-#include <stdio.h>
 #include "HD44780.h"
 #include "freertos/FreeRTOS.h"
 
 void app_main(void)
 {
-    const uint32_t twentyMilliDelay = 20 / portTICK_PERIOD_MS;
-    const uint32_t fiveMilliDelay = 5 / portTICK_PERIOD_MS;
+    HD44780_FOUR_BIT_BUS bus = { 18, 19, 21, 22, 16, 17 }; 
 
-    //HD44780_FOUR_BIT_BUS bus = { GPIO_NUM_33, GPIO_NUM_32, GPIO_NUM_18, GPIO_NUM_19, 
-    //                            GPIO_NUM_26, GPIO_NUM_25 };
+    HD44780_initFourBitBus(&bus);
 
-    //HD44780_InitFourBitBus(&bus);
+    uint8_t smileyChar[8] = {
+        0b00000,
+        0b01010,
+        0b01010,
+        0b00000,
+        0b10001,
+        0b10001,
+        0b01110,
+        0b00000
+    };
 
-    HD44780_EIGHT_BIT_BUS bus = { GPIO_NUM_18, GPIO_NUM_19, GPIO_NUM_21, GPIO_NUM_22, 
-                                  GPIO_NUM_23, GPIO_NUM_25, GPIO_NUM_26, GPIO_NUM_27,
-                                  GPIO_NUM_16, GPIO_NUM_17 };
+    uint8_t invertSmileyChar[8] = {
+        0b11111,
+        0b10101,
+        0b10101,
+        0b11111,
+        0b01110,
+        0b01110,
+        0b10001,
+        0b11111
+    };
     
-    HD44780_InitEightBitBus(&bus);
+    HD44780_createChar(0, smileyChar);
+    HD44780_createChar(1, invertSmileyChar);
 
-    vTaskDelay(150 / portTICK_PERIOD_MS);
+    HD44780_setCursorPos(3,0);
+    HD44780_print("This is a");
+    HD44780_setCursorPos(3,1);
+    HD44780_writeChar(0);
+    HD44780_print("  test ");
+    HD44780_writeChar(1);
 
-    printf("Sending reset and set mode sent.\n");
-    HD44780_SendInstruction(0x30);
-    vTaskDelay(twentyMilliDelay);
-    HD44780_SendInstruction(0x30);
-    vTaskDelay(twentyMilliDelay);
-    HD44780_SendInstruction(0x30);
-    vTaskDelay(twentyMilliDelay);
-    HD44780_SendInstruction(0x30);
-    vTaskDelay(twentyMilliDelay);
-    printf("Reset and set mode sent.\n");
+    const uint32_t shiftDelay = 500 / portTICK_PERIOD_MS;
 
-    HD44780_SendInstruction(0x08);
-    HD44780_SendInstruction(0x01);
-    vTaskDelay(twentyMilliDelay);
-    HD44780_SendInstruction(0x06);
+    for (int i = 0; i < 4; i++) {
+        HD44780_shiftDispRight();
+        vTaskDelay(shiftDelay);
+    }
 
-    HD44780_SendInstruction(0x0F);
-    //HD44780_SendInstruction(HD44780_CURSOR_BLINK);
+    for (int i = 0; i < 7; i++) {
+        HD44780_shiftDispLeft();
+        vTaskDelay(shiftDelay);
+    }
 
-    HD44780_SendData('T');
-    HD44780_SendData('h');
-    HD44780_SendData('i');
-    HD44780_SendData('s');
-    HD44780_SendData(' ');
-    HD44780_SendData('a');
-    HD44780_SendData(' ');
-    HD44780_SendData('t');
-    HD44780_SendData('r');
-    HD44780_SendData('i');
-    HD44780_SendData('u');
-    HD44780_SendData('m');
-    HD44780_SendData('p');
-    HD44780_SendData('h');
+    while (true) {
+        for (int i = 0; i < 7; i++) {
+            HD44780_shiftDispRight();
+            vTaskDelay(shiftDelay);
+        }
+
+        for (int i = 0; i < 7; i++) {
+            HD44780_shiftDispLeft();
+            vTaskDelay(shiftDelay);
+        }
+    }
+    //bool pattern = false;
+
+    //while (true) {
+    //    HD44780_clear();
+
+    //    for (int i = 0; i < 16; i+=2) {
+    //        HD44780_setCursorPos(i, (pattern == false));
+    //        HD44780_write("*");
+    //    }
+
+    //    for (int i = 1; i < 16; i+=2) {
+    //        HD44780_setCursorPos(i, (pattern == true));
+    //        HD44780_write("*");
+    //    }
+
+    //    pattern = !pattern;
+
+    //    vTaskDelay(2000 / portTICK_PERIOD_MS);
+    //}
 }
