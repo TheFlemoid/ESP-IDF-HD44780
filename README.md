@@ -34,16 +34,22 @@ HD44780 displays are driven in one of three modes:
    erks you and you would like to use this library with an I2C character LCD, please drop an issue on this repo and 
    I'll look into adding support for such a thing.
 
-Once you've determined the display mode you want, you need to make a struct specific to that mode to initialize the display.  For 4-bit mode, create an HD44780_FOUR_BIT_BUS or for 8-bit mode, create an HD44780_EIGHT_BIT_BUS struct.  The structs are as follows:
-* HD44870_FOUR_BIT_BUS has six parameters
+Once you've determined the display mode you want, you need to make a struct specific to that mode to initialize the 
+display.  For 4-bit mode create an HD44780_FOUR_BIT_BUS or, for 8-bit mode, create an HD44780_EIGHT_BIT_BUS struct.  
+The structs are as follows:
+* 4-bit mode: HD44870_FOUR_BIT_BUS which has six parameters
   * 1: GPIO pin number connected to D4
   * 2: GPIO pin number connected to D5
   * 3: GPIO pin number connected to D6
   * 4: GPIO pin number connected to D7
   * 5: GPIO pin number connected to RS
   * 6: GPIO pin number connected to E
+* Example: 
+```
+HD44780_FOUR_BIT_BUS fourBitBus = { 18, 19, 21, 22, 16, 17 }; 
+```
 
-* HD44870_EIGHT_BIT_BUS has ten parameters
+* 8-bit mode: HD44870_EIGHT_BIT_BUS which has ten parameters
   * 1: GPIO pin number connected to D0
   * 2: GPIO pin number connected to D1
   * 3: GPIO pin number connected to D2
@@ -54,58 +60,179 @@ Once you've determined the display mode you want, you need to make a struct spec
   * 8: GPIO pin number connected to D7
   * 9: GPIO pin number connected to RS
   * 10: GPIO pin number connected to E
+* Example: 
+```
+HD44780_EIGHT_BIT_BUS eightBitBus = { 18, 19, 21, 22, 23, 25, 26, 27, 16, 17 }; 
+```
+
+Once you've made the struct that corresponds to your desired mode of operation, call either HD44780_initFourBitBus or
+HD44780_initEightBitBus, passing in a reference to the struct for either function.
+```
+HD44780_initFourBitBus(&fourBitBus);
+```
+```
+HD44780_initEightBitBus(&eightBitBus);
+```
+
+This function will initialize all of the GPIOs in the struct as outputs, and will perform an initialization
+routine on the HD44780 controlled character LCD.
+
+After initializing the bus and the display, the display can be used for normal operation.  This library exposes
+a number of functions to the calling application.  All functions as well as their parameters are described below.
+
 ---
 
-## HD44780 Initialization:
-Initializing the HD44780 controller is a little tricky, as the datasheet is somewhat
-obtuse about the process and there are two modes that the controller
-can be initialized to (4-bit and 8-bit mode).  Outside of the 
-[HD44780 datasheet](resources/HD44780.pdf) 
-(pdf warning) I got the information to initialize the display from an [Alfred State
-College blog](https://web.alfredstate.edu/faculty/weimandn/lcd/lcd_initialization/lcd_initialization_index.html).
+<details>
+<summary><b>HD44780_initFourBitBus(HD44780_FOUR_BIT_BUS *bus)</b></summary>
+<h4>Description</h4>
+Initializes all GPIOs in the param four bit bus and initializes the display.
+<h4>Parameters</h4>
+*bus: pointer to the HD44780_FOUR_BIT_BUS struct defining the bus
+</details>
 
-HD44780 init steps for either 8 or 4 bit mode are as follows:
-1. Wait 100ms (actual startup delay is >40ms, but this is only 
-   done once so erring on the side of caution.)
-2. Send HD44780_INIT_SEQ (0x30), then delay >4ms.  This is a special
-   case of the function set instruction where only the upper nibble
-   (D4-D7) is considered by the driver.  Three of these instructions 
-   together will cause the driver to reset, which is the goal here.
-3. Send HD44780_INIT_SEQ (0x30) again, then delay >100us.
-4. Send HD44780_INIT_SEQ (0x30) a third time, then delay >100us.
-   This will cause the display to do a soft reset.
-5. For 4-bit mode initialization, send instruction HD44780_FOUR_BIT_MODE
-   (0x20) and delay >100us.  This tells the controller that all
-   commands going forward are on D4-D7 only, and to ignore D0-3 entirely.
-   This step should be skipped for 8-bit mode operation.
-6. Send the actual function set instruction then wait >50us.  
-   The function set instruction is as follows: 
-     0b001(DL)(N)(F)00 where:
-     - DL is 1 for 8-bit mode or 0 for 4-bit mode
-     - N is 0 for one line, or 1 for two line (this is the logical
-       number of lines as perceived by the LCD controller, which 
-       would still be two for four line displays).
-     - F is 0 for 5x8 dot character font, or 1 for 5x10 dot character
-       font (this will almost always be 0, or 5x8 font).
-     - For 8-bit operation, this will usually be 0x38.  For 4-bit operation, this will 
-       usually be 0x28.  In practice, we OR together the DL, N, and F bitmasks here.
-7. Send HD44780_DISP_OFF and delay >50us.  The lower three bits 
-   of this instruction control whether the display itself (D), 
-   the cursor (C), and the cursor blink (B) should be on or off, 
-   but for now we turn all of them off.
-8. Send HD44780_DISP_CLEAR and delay >3ms.  This clears all 80 DDRAM
-   addresses on the display, hence the longer wait time.
-9. Send HD44780_ENTRY_MODE and delay >50us.  The lower two bits of 
-   this command control whether the cursor should move (I/D) left 
-   to right (1) or right to left (0), and whether the display should 
-   shift (S) (1) or not shift (0).  We typically want the cursor to 
-   move left to right and for the display to not shift, so 0x06.
-10. The display is now initialized, but it was turned off in step 7,
-    so we have to turn it on and set our display mode.
-11. Send HD44780_DISP_ON and delay >50us. Set the lower two bits 
-    based on whether the cursor should be on (C) and the cursor 
-    should blink (B). For example, sending HD44780_DISP_ON would 
-    just turn the display on, HD44780_CUSOR_ON would turn the 
-    display on and display the cursor, and HD44780_CURSOR_BLINK would
-    turn the cursor on and cause it to blink.
+---
 
+<details>
+<summary><b>HD44780_initEightBitBus(HD44780_EIGHT_BIT_BUS *bus)</b></summary>
+<h4>Description</h4>
+Initializes all GPIOs in the param eight bit bus and initializes the display.
+<h4>Parameters</h4>
+*bus: pointer to the HD44780_EIGHT_BIT_BUS struct defining the bus
+</details>
+
+---
+
+<details>
+<summary><b>HD44780_print(char* data)</b></summary>
+<h4>Description</h4>
+Prints the param String to the display
+<h4>Parameters</h4>
+data: character array to print to the display
+</details>
+
+---
+
+<details>
+<summary><b>HD44780_clear()</b></summary>
+<h4>Description</h4>
+Clears the display, replacing all characters with white space
+</details>
+
+---
+
+<details>
+<summary><b>HD44780_setCursorPos(int col, int row)</b></summary>
+<h4>Description</h4>
+Sets the cursor position to the location specified by the params
+<h4>Parameters</h4>
+col: Integer column to set the cursor to (0-15)
+
+row: Integer row to set the cursor to (0-1)
+</details>
+
+---
+
+<details>
+<summary><b>HD44780_homeCursor()</b></summary>
+<h4>Description</h4>
+Sets the cursor position to the home position of 0, 0
+</details>
+
+---
+
+<details>
+<summary><b>HD44780_createChar(int slot, uint8_t* data)</b></summary>
+<h4>DescrViption</h4>
+Create a custom character in the param slot, from the param byte array
+<h4>Parameters</h4>
+slot: Integer (0-7) of the slot to store the character in
+
+data: Byte array of the character.  
+</details>
+
+---
+
+<details>
+<summary><b>HD44780_writeChar(int slot)</b></summary>
+<h4>Description</h4>
+Write a custom character to the display.
+<h4>Parameters</h4>
+slot: Integer (0-7) of the slot that the custom character was written to.
+</details>
+
+---
+
+<details>
+<summary><b>HD44780_shiftDispLeft()</b></summary>
+<h4>Description</h4>
+Shifts all characters on the display one position to the left.
+</details>
+
+---
+
+<details>
+<summary><b>HD44780_shiftDispRight()</b></summary>
+<h4>Description</h4>
+Shifts all characters on the display one position to the right.
+</details>
+
+---
+
+<details>
+<summary><b>HD44780_blink()</b></summary>
+<h4>Description</h4>
+Turns on the visual cursor and sets it to blink.
+</details>
+
+---
+
+<details>
+<summary><b>HD44780_noBlink()</b></summary>
+<h4>Description</h4>
+Turns on the visual cursor and sets it to not blink (remain solid).
+
+<b>NOTE:</b> This is functionally the same as HD44780_cursor()
+</details>
+
+---
+
+<details>
+<summary><b>HD44780_cursor()</b></summary>
+<h4>Description</h4>
+Turns on the visual cursor and sets it to not blink (remain solid).
+
+<b>NOTE:</b> This is functionally the same as HD44780_noBlink()
+</details>
+
+---
+
+<details>
+<summary><b>HD44780_noCursor()</b></summary>
+<h4>Description</h4>
+Turns off the visual cursor.
+
+<b>NOTE:</b> This is functionally the same as HD44780_dispOn()
+</details>
+
+---
+
+<details>
+<summary><b>HD44780_dispOff()</b></summary>
+<h4>Description</h4>
+Turns the display off.
+
+<b>NOTE:</b> As this library does not control the backlight, it is expected
+      that toggling the backlight on/off is handled by the main application.
+</details>
+
+---
+
+<details>
+<summary><b>HD44780_dispOn()</b></summary>
+<h4>Description</h4>
+Turns the display on and turns off the visual cursor.
+
+<b>NOTE:</b> This is functionally the same as HD44780_noCursor()
+</details>
+
+---
