@@ -29,16 +29,16 @@ Would create the following smiley face character.
 
 [Here is a WYSIWYG editor](https://omerk.github.io/lcdchargen/) for generating custom characters
 that spits out the appropriate array.  It was written primarily for the Arduino LiquidCrystal
-library, but since this library supports this feature in a similar manner to LiquidCrystal, the
+library, but since this library supports this feature in a similar manner to LiquidCrystal the
 output will work the same.
 
 ## HD44780 Initialization:
 Initializing the HD44780 controller is a little tricky, as the datasheet is somewhat
 obtuse about the process and there are two modes that the controller
-can be initialized to (4-bit and 8-bit mode).  Outside of the 
-[HD44780 datasheet](resources/HD44780.pdf) 
-(pdf warning) I got the information to initialize the display from an [Alfred State
-College blog](https://web.alfredstate.edu/faculty/weimandn/lcd/lcd_initialization/lcd_initialization_index.html).
+can be initialized to (4-bit and 8-bit mode).  This is abstracted away when using this library,
+but I thought it may be an interesting thing to write about here.  Outside of the 
+[HD44780 datasheet](resources/HD44780.pdf) (pdf warning) I got the information to initialize 
+the display from an [Alfred State College blog](https://web.alfredstate.edu/faculty/weimandn/lcd/lcd_initialization/lcd_initialization_index.html).
 
 HD44780 init steps for either 8 or 4 bit mode are as follows:
 1. Wait 100ms (actual startup delay is >40ms, but this is only 
