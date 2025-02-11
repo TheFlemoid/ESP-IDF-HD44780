@@ -10,7 +10,7 @@
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "rom/ets_sys.h"
-#include "HD44780.h"
+#include "include/HD44780.h"
 
 HD44780_DISPLAY_MODE displayMode;
 HD44780_FOUR_BIT_BUS *fourBus;
