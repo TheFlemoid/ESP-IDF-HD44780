@@ -1,8 +1,20 @@
-ESP-32 drivers for common Hitachi HD44780 character LCD displays.
+# ESP-IDF HD44780
 
-Currently supports HD44780 in either 8 bit and 4 bit mode.
+<H2>ESP-32 drivers for common Hitachi HD44780 character LCD displays.</H2>
+Can be dropped into any ESP-IDF project as an IDF components.  Currently supports two row HD44780 based displays.
 
-Work in progress.
+Supports all standard HD44780 display functionality:
+ - Initializing displays in either 4-bit or 8-bit mode.
+ - Arbitrarily setting the position of the cursor.
+ - Controlling whether the cursor is on and whether it blinks.
+ - Writing strings of text to the display.
+ - Clearing the display.
+ - Creating and displaying up to eight arbitrarily defined, custom 5x8 px characters.
+
+Written in pure C.
+
+Licensed under the permissive MIT License, these drivers can be copied, used, modified, and distributed openly.
+Attribution is appreciated, but is in no way mandatory.
 
 ---
 

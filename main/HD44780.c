@@ -1,3 +1,11 @@
+/**
+ * File:       HD44780.c
+ * Author:     Franklyn Dahlberg
+ * Created:    10 February, 2025
+ * Copyright:  2025  Franklyn Dahlberg
+ * License:    MIT License (see https://choosealicense.com/licenses/mit/)
+ */
+
 #include <string.h>
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
