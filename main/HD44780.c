@@ -408,3 +408,4 @@ void HD44780_SendData(unsigned short int data) {
         HD44780_Send8BitsIn8BitMode(data);
     }
 }
+
