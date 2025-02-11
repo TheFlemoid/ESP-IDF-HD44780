@@ -1,3 +1,37 @@
+## Custom Character Usage:
+The HD44780 supports up to 8 custom 5x8 pixel characters that are stored in the controller's
+CGRAM and can be used just like any other predefined character.  To create a character
+with this library you use the HD44780_createChar() function, that takes in an integer
+parameter of what 'slot' of CGRAM the character should be stored in (basically an
+integer identifier for the character), and an array of 8 bytes (uint8_t).  Within
+the array, for each byte the last five bits are used to define the pixels of one row of
+the character.  The first byte in the array correlates with the top row of the character,
+and the 8th byte in the array correlates with the bottom row of the character.
+
+So, the following array:
+```
+uint8_t smileyChar[8] = {
+    0b00000,
+    0b01010,
+    0b01010,
+    0b00000,
+    0b10001,
+    0b10001,
+    0b01110,
+    0b00000
+};
+```
+Would create the following smiley face character.
+
+<p align="center">
+    <img src="./smiley_character.jpg" alt="Custom Character Example"/>
+</p>
+
+[Here is a WYSIWYG editor](https://omerk.github.io/lcdchargen/) for generating custom characters
+that spits out the appropriate array.  It was written primarily for the Arduino LiquidCrystal
+library, but since this library supports this feature in a similar manner to LiquidCrystal, the
+output will work the same.
+
 ## HD44780 Initialization:
 Initializing the HD44780 controller is a little tricky, as the datasheet is somewhat
 obtuse about the process and there are two modes that the controller
