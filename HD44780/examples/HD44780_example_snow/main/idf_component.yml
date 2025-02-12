@@ -1,0 +1,5 @@
+dependencies:
+  TheFlemoid/HD44780:
+    version: "*"
+    override_path: '../../..'
+    

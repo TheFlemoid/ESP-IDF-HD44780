@@ -1,3 +1,15 @@
+/**
+ * File:       HD44780_example_scroll.c
+ * Author:     Franklyn Dahlberg
+ * Created:    10 February, 2025
+ * Copyright:  2025 (c) Franklyn Dahlberg
+ * License:    MIT License (see https://choosealicense.com/licenses/mit/)
+ */
+
+/**
+ * Shows a two line string with two special characters that moves left
+ * to right on a loop.  Designed to show basic HD44780 functionality.
+ */
 #include "HD44780.h"
 #include "freertos/FreeRTOS.h"
 
@@ -62,23 +74,5 @@ void app_main(void)
             vTaskDelay(shiftDelay);
         }
     }
-    //bool pattern = false;
-
-    //while (true) {
-    //    HD44780_clear();
-
-    //    for (int i = 0; i < 16; i+=2) {
-    //        HD44780_setCursorPos(i, (pattern == false));
-    //        HD44780_write("*");
-    //    }
-
-    //    for (int i = 1; i < 16; i+=2) {
-    //        HD44780_setCursorPos(i, (pattern == true));
-    //        HD44780_write("*");
-    //    }
-
-    //    pattern = !pattern;
-
-    //    vTaskDelay(2000 / portTICK_PERIOD_MS);
-    //}
 }
+

@@ -13,7 +13,14 @@ Supports all standard HD44780 display functionality:
  - Clearing the display.
  - Creating and displaying up to eight arbitrarily defined, custom 5x8 pixel characters.
 
-Written in pure C.
+&nbsp; 
+
+To use in a project, simply drop the HD44780 directory from this repo into either your core esp-idf components
+directory, or (more typically) drop it into the "components" directory of your individual project.
+
+&nbsp; 
+
+Written in pure C, for easy portability going forward.
 
 Licensed under the permissive MIT License, these drivers can be copied, used, modified, and distributed openly.
 Attribution is appreciated, but is in no way mandatory.
