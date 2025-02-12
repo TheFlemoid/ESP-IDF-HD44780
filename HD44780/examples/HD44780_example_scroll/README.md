@@ -23,6 +23,6 @@ four bit mode, and should be set up as follows.
 
 On the display, pin 1 should be connected to ground and pin 2 connected to 5V.  Pin 3 is the
 contrast control, and needs to be connected to a voltage divider for tuning.  Typically, connect
-pin 3 to the center (wiper) pin of a 10K potentiometer, and connect once side to 5V and the other
+pin 3 to the center (wiper) pin of a 10K potentiometer, and connect one side to 5V and the other
 to ground (making an adjustable voltage divider).  Connected pin 5 (RW) to ground, to ensure that
 the HD44780 is in write mode for all operations.
