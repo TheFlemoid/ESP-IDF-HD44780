@@ -1,0 +1,16 @@
+dependencies:
+  TheFlemoid/HD44780:
+    dependencies: []
+    source:
+      path: /home/dobby/Projects/espFun/ESP-IDF-HD44780/HD44780
+      type: local
+    version: '*'
+  idf:
+    source:
+      type: idf
+    version: 5.3.0
+direct_dependencies:
+- TheFlemoid/HD44780
+manifest_hash: 55b3efb9fb04ca2bb22eac00acce4e32e84dd3cdd528243e6fd41e9beef96b65
+target: esp32
+version: 2.0.0

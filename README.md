@@ -13,7 +13,7 @@ Supports all standard HD44780 display functionality:
  - Clearing the display.
  - Creating and displaying up to eight arbitrarily defined, custom 5x8 pixel characters.
 
-Written in pure C.
+Written in pure C, for easy portability going forward.
 
 Licensed under the permissive MIT License, these drivers can be copied, used, modified, and distributed openly.
 Attribution is appreciated, but is in no way mandatory.
