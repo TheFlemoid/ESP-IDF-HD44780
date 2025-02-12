@@ -1,5 +1,5 @@
 /**
- * File:       main.c
+ * File:       HD44780_example_snow.c
  * Author:     Franklyn Dahlberg
  * Created:    10 February, 2025
  * Copyright:  2025  Franklyn Dahlberg
@@ -26,17 +26,17 @@ void app_main(void)
 
         for (int i = 0; i < 16; i+=2) {
             HD44780_setCursorPos(i, (pattern == false));
-            HD44780_write("*");
+            HD44780_print("*");
         }
 
         for (int i = 1; i < 16; i+=2) {
             HD44780_setCursorPos(i, (pattern == true));
-            HD44780_write("*");
+            HD44780_print("*");
         }
 
         pattern = !pattern;
 
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 
