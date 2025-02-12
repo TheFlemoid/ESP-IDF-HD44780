@@ -13,7 +13,7 @@ In terms of physical connection, this project is by default designed to be run i
 four bit mode, and should be set up as follows.
 
 | ESP-32 | HD44780 Pin |
-| --- | --- |
+| :---: | :---: |
 | GPIO 18  | D4 |
 | GPIO 19  | D5 |
 | GPIO 21  | D6 |
