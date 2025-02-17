@@ -47,7 +47,9 @@ void updateTimeAfterInit();
 void setupDisplay(HD44780_FOUR_BIT_BUS *bus);
 void updateDisplay(struct tm *timeinfo);
 
-
+/**
+ * Application main
+ */
 void app_main(void)
 {
     HD44780_FOUR_BIT_BUS bus = { 4, 20, 18, 19, 21, 22, 16, 17 };
@@ -75,7 +77,11 @@ void app_main(void)
     }
 }
 
-
+/**
+ * Connects to the WiFi SSID specified in the projects defconfig (menuconfig),
+ * connects to an SNTP server to get the current time, and sets the systems
+ * internal real time clock (RTC) accordingly.
+ */
 static void obtain_time(void)
 {
     ESP_ERROR_CHECK( nvs_flash_init() );
@@ -92,7 +98,6 @@ static void obtain_time(void)
      * This is the basic default config with one server and starting the service
      */
     esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG(CONFIG_SNTP_TIME_SERVER);
-    //config.sync_cb = time_sync_notification_cb;     // Note: This is only needed if we want
 
     esp_netif_sntp_init(&config);
 
@@ -110,7 +115,9 @@ static void obtain_time(void)
     esp_netif_sntp_deinit();
 }
 
-
+/**
+ * Obtains the time from the local RTC and updates the display accordingly.
+ */
 void updateTimeAfterInit() {
     time_t now;
     struct tm timeinfo;
@@ -119,7 +126,12 @@ void updateTimeAfterInit() {
     updateDisplay(&timeinfo);
 }
 
-
+/**
+ * Sets up the HD44780 by defining all special characters used and 
+ * storing them in CGRAM, and then draws a pattern on the display.
+ * 
+ * @param bus HD44780_FOUR_BIT_BUS to setup
+ */
 void setupDisplay(HD44780_FOUR_BIT_BUS *bus) {
     HD44780_initFourBitBus(bus);
 
@@ -222,7 +234,11 @@ void setupDisplay(HD44780_FOUR_BIT_BUS *bus) {
     HD44780_writeChar(BOTTOM_RIGHT_L);
 }
 
-
+/**
+ * Updates the date and time on the display to match the param time object.
+ * 
+ * @param timeinfo tm object containing the time to update the display to
+ */
 void updateDisplay(struct tm *timeinfo) {
     
     char strftime_buf[16];
