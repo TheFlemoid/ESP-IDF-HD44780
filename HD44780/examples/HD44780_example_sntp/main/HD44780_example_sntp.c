@@ -39,7 +39,7 @@ void updateDisplay(struct tm *timeinfo);
 
 void app_main(void)
 {
-    HD44780_FOUR_BIT_BUS bus = { 18, 19, 21, 22, 16, 17 };
+    HD44780_FOUR_BIT_BUS bus = { 2, 16, 18, 19, 21, 22, 16, 17 };
     setupDisplay(&bus);
 
     time_t now;

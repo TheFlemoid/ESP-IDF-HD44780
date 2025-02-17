@@ -15,7 +15,7 @@
 
 void app_main(void)
 {
-    HD44780_FOUR_BIT_BUS bus = { 18, 19, 21, 22, 16, 17 }; 
+    HD44780_FOUR_BIT_BUS bus = { 2, 16, 18, 19, 21, 22, 16, 17 }; 
 
     HD44780_initFourBitBus(&bus);
 
@@ -24,12 +24,12 @@ void app_main(void)
     while (true) {
         HD44780_clear();
 
-        for (int i = 0; i < 16; i+=2) {
+        for (int i = 0; i < 20; i+=2) {
             HD44780_setCursorPos(i, (pattern == false));
             HD44780_print("*");
         }
 
-        for (int i = 1; i < 16; i+=2) {
+        for (int i = 1; i < 20; i+=2) {
             HD44780_setCursorPos(i, (pattern == true));
             HD44780_print("*");
         }
