@@ -1,0 +1,6 @@
+dependencies:
+  protocol_examples_common:
+    path: ${IDF_PATH}/examples/common_components/protocol_examples_common
+  TheFlemoid/HD44780:
+    version: "*"
+    override_path: '../../..'
