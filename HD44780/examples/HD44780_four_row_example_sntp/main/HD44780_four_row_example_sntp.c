@@ -1,11 +1,21 @@
-/* LwIP SNTP example
+/**
+ * File:       HD44780_four_row_example_scroll.c
+ * Author:     Franklyn Dahlberg
+ * Created:    17 February, 2025
+ * Copyright:  2025 (c) Franklyn Dahlberg
+ * License:    MIT License (see https://choosealicense.com/licenses/mit/)
+ */
 
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
+/**
+ * Example for a 4x20 HD44780 display that attempts to connect to wifi and gets
+ * the current time from an NTP server.  If successful, it then sets the ESP-32s
+ * internal real time clock (RTC) to the current time, and displays the current
+ * date and time on the HD44780 display.
+ * 
+ * NOTE: Much of this code was directly pulled from the ESP-IDF SNTP example,
+ *       which states that much of the WLAN setup code is example code, and
+ *       isn't suitable for a production environment.
+ */
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
@@ -25,6 +35,7 @@
 #define BOTTOM_RIGHT_L 2
 #define BOTTOM_LEFT_L 3
 #define BOTTOM_DASH 4
+#define PIPE 5
 
 #ifndef INET6_ADDRSTRLEN
 #define INET6_ADDRSTRLEN 48
@@ -39,7 +50,7 @@ void updateDisplay(struct tm *timeinfo);
 
 void app_main(void)
 {
-    HD44780_FOUR_BIT_BUS bus = { 2, 16, 18, 19, 21, 22, 16, 17 };
+    HD44780_FOUR_BIT_BUS bus = { 4, 20, 18, 19, 21, 22, 16, 17 };
     setupDisplay(&bus);
 
     time_t now;
@@ -166,25 +177,46 @@ void setupDisplay(HD44780_FOUR_BIT_BUS *bus) {
         0b00000,
         0b00000
     };
+
+    uint8_t pipe[8] = {
+        0b00100,
+        0b00100,
+        0b00100,
+        0b00100,
+        0b00100,
+        0b00100,
+        0b00100,
+        0b00100
+    };
     
     HD44780_createChar(TOP_LEFT_L, topLeftL);
     HD44780_createChar(TOP_RIGHT_L, topRightL);
     HD44780_createChar(BOTTOM_RIGHT_L, bottomRightL);
     HD44780_createChar(BOTTOM_LEFT_L, bottomLeftL);
     HD44780_createChar(BOTTOM_DASH, bottomDash);
+    HD44780_createChar(PIPE, pipe);
 
     // Print a square pattern across the entire screen.
-    // The characters holding data will be overwritten when they first update.
     HD44780_homeCursor();
     HD44780_writeChar(TOP_LEFT_L);
-    for(int i = 0; i < 14; i++) {
+    for(int i = 0; i < 18; i++) {
         HD44780_print("-");
     }
     HD44780_writeChar(TOP_RIGHT_L);
 
     HD44780_setCursorPos(0, 1);
+    HD44780_writeChar(PIPE);
+    HD44780_setCursorPos(19, 1);
+    HD44780_writeChar(PIPE);
+
+    HD44780_setCursorPos(0, 2);
+    HD44780_writeChar(PIPE);
+    HD44780_setCursorPos(19, 2);
+    HD44780_writeChar(PIPE);
+
+    HD44780_setCursorPos(0, 3);
     HD44780_writeChar(BOTTOM_LEFT_L);
-    for(int i = 0; i < 14; i++) {
+    for(int i = 0; i < 18; i++) {
         HD44780_writeChar(BOTTOM_DASH);
     }
     HD44780_writeChar(BOTTOM_RIGHT_L);
@@ -197,11 +229,11 @@ void updateDisplay(struct tm *timeinfo) {
 
     // String format the date and print to the first row
     strftime(strftime_buf, sizeof(strftime_buf), "%d %b, %Y", timeinfo);
-    HD44780_setCursorPos(2, 0);
+    HD44780_setCursorPos(4, 1);
     HD44780_print(strftime_buf);
 
     // String format the time and print to the second row
     strftime(strftime_buf, sizeof(strftime_buf), "%X", timeinfo);
-    HD44780_setCursorPos(4, 1);
+    HD44780_setCursorPos(6, 2);
     HD44780_print(strftime_buf);
 }

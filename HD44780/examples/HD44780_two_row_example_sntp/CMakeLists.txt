@@ -5,5 +5,5 @@
 cmake_minimum_required(VERSION 3.16)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-project(HD44780_example_sntp)
+project(HD44780_two_row_example_sntp)
 
