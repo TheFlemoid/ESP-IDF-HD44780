@@ -16,6 +16,8 @@ typedef enum _displayMode {
 } HD44780_DISPLAY_MODE;
 
 typedef struct _fourBitBus {
+    int rows;
+    int columns;
     gpio_num_t D4;
     gpio_num_t D5;
     gpio_num_t D6;
@@ -25,6 +27,8 @@ typedef struct _fourBitBus {
 } HD44780_FOUR_BIT_BUS;
 
 typedef struct _eightBitBus {
+    int rows;
+    int columns;
     gpio_num_t D0;
     gpio_num_t D1;
     gpio_num_t D2;
@@ -117,6 +121,8 @@ void HD44780_dispOn();
 //       using the constants below (setCursor, shift, etc).
 #define HD44780_ROW1_START      0x00
 #define HD44780_ROW2_START      0x40
+#define HD44780_ROW3_START      0x14
+#define HD44780_ROW4_START      0x54
 #define HD44780_CGRAM_START     0x40
 #define HD44780_ROWS            2
 #define HD44780_COLS            16

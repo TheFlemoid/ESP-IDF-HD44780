@@ -1,11 +1,21 @@
-/* LwIP SNTP example
+/**
+ * File:       HD44780_four_row_example_scroll.c
+ * Author:     Franklyn Dahlberg
+ * Created:    17 February, 2025
+ * Copyright:  2025 (c) Franklyn Dahlberg
+ * License:    MIT License (see https://choosealicense.com/licenses/mit/)
+ */
 
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
+/**
+ * Example for a 4x20 HD44780 display that attempts to connect to wifi and gets
+ * the current time from an NTP server.  If successful, it then sets the ESP-32s
+ * internal real time clock (RTC) to the current time, and displays the current
+ * date and time on the HD44780 display.
+ * 
+ * NOTE: Much of this code was directly pulled from the ESP-IDF SNTP example,
+ *       which states that much of the WLAN setup code is example code, and
+ *       isn't suitable for a production environment.
+ */
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
@@ -25,21 +35,23 @@
 #define BOTTOM_RIGHT_L 2
 #define BOTTOM_LEFT_L 3
 #define BOTTOM_DASH 4
+#define PIPE 5
 
 #ifndef INET6_ADDRSTRLEN
 #define INET6_ADDRSTRLEN 48
 #endif
 
 // Function predefinitions
-static void obtain_time(void);
+static void obtain_time();
 void updateTimeAfterInit();
 void setupDisplay(HD44780_FOUR_BIT_BUS *bus);
 void updateDisplay(struct tm *timeinfo);
 
-
-void app_main(void)
-{
-    HD44780_FOUR_BIT_BUS bus = { 18, 19, 21, 22, 16, 17 };
+/**
+ * Application main
+ */
+void app_main() {
+    HD44780_FOUR_BIT_BUS bus = { 4, 20, 18, 19, 21, 22, 16, 17 };
     setupDisplay(&bus);
 
     time_t now;
@@ -59,14 +71,18 @@ void app_main(void)
     tzset();
 
     while (true) {
+        // 500ms delay so that we always update on the second, due to Nyquist
         vTaskDelay(500 / portTICK_PERIOD_MS);
         updateTimeAfterInit();
     }
 }
 
-
-static void obtain_time(void)
-{
+/**
+ * Connects to the WiFi SSID specified in the projects defconfig (menuconfig),
+ * connects to an SNTP server to get the current time, and sets the systems
+ * internal real time clock (RTC) accordingly.
+ */
+static void obtain_time() {
     ESP_ERROR_CHECK( nvs_flash_init() );
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK( esp_event_loop_create_default() );
@@ -81,7 +97,6 @@ static void obtain_time(void)
      * This is the basic default config with one server and starting the service
      */
     esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG(CONFIG_SNTP_TIME_SERVER);
-    //config.sync_cb = time_sync_notification_cb;     // Note: This is only needed if we want
 
     esp_netif_sntp_init(&config);
 
@@ -99,7 +114,9 @@ static void obtain_time(void)
     esp_netif_sntp_deinit();
 }
 
-
+/**
+ * Obtains the time from the local RTC and updates the display accordingly.
+ */
 void updateTimeAfterInit() {
     time_t now;
     struct tm timeinfo;
@@ -108,7 +125,12 @@ void updateTimeAfterInit() {
     updateDisplay(&timeinfo);
 }
 
-
+/**
+ * Sets up the HD44780 by defining all special characters used and 
+ * storing them in CGRAM, and then draws a pattern on the display.
+ * 
+ * @param bus HD44780_FOUR_BIT_BUS to setup
+ */
 void setupDisplay(HD44780_FOUR_BIT_BUS *bus) {
     HD44780_initFourBitBus(bus);
 
@@ -166,42 +188,67 @@ void setupDisplay(HD44780_FOUR_BIT_BUS *bus) {
         0b00000,
         0b00000
     };
+
+    uint8_t pipe[8] = {
+        0b00100,
+        0b00100,
+        0b00100,
+        0b00100,
+        0b00100,
+        0b00100,
+        0b00100,
+        0b00100
+    };
     
     HD44780_createChar(TOP_LEFT_L, topLeftL);
     HD44780_createChar(TOP_RIGHT_L, topRightL);
     HD44780_createChar(BOTTOM_RIGHT_L, bottomRightL);
     HD44780_createChar(BOTTOM_LEFT_L, bottomLeftL);
     HD44780_createChar(BOTTOM_DASH, bottomDash);
+    HD44780_createChar(PIPE, pipe);
 
     // Print a square pattern across the entire screen.
-    // The characters holding data will be overwritten when they first update.
     HD44780_homeCursor();
     HD44780_writeChar(TOP_LEFT_L);
-    for(int i = 0; i < 14; i++) {
+    for(int i = 0; i < 18; i++) {
         HD44780_print("-");
     }
     HD44780_writeChar(TOP_RIGHT_L);
 
     HD44780_setCursorPos(0, 1);
+    HD44780_writeChar(PIPE);
+    HD44780_setCursorPos(19, 1);
+    HD44780_writeChar(PIPE);
+
+    HD44780_setCursorPos(0, 2);
+    HD44780_writeChar(PIPE);
+    HD44780_setCursorPos(19, 2);
+    HD44780_writeChar(PIPE);
+
+    HD44780_setCursorPos(0, 3);
     HD44780_writeChar(BOTTOM_LEFT_L);
-    for(int i = 0; i < 14; i++) {
+    for(int i = 0; i < 18; i++) {
         HD44780_writeChar(BOTTOM_DASH);
     }
     HD44780_writeChar(BOTTOM_RIGHT_L);
 }
 
-
+/**
+ * Updates the date and time on the display to match the param time object.
+ * 
+ * @param timeinfo tm object containing the time to update the display to
+ */
 void updateDisplay(struct tm *timeinfo) {
     
     char strftime_buf[16];
 
     // String format the date and print to the first row
     strftime(strftime_buf, sizeof(strftime_buf), "%d %b, %Y", timeinfo);
-    HD44780_setCursorPos(2, 0);
+    HD44780_setCursorPos(4, 1);
     HD44780_print(strftime_buf);
 
     // String format the time and print to the second row
     strftime(strftime_buf, sizeof(strftime_buf), "%X", timeinfo);
-    HD44780_setCursorPos(4, 1);
+    HD44780_setCursorPos(6, 2);
     HD44780_print(strftime_buf);
 }

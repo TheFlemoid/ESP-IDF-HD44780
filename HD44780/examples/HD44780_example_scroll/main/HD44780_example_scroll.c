@@ -7,15 +7,16 @@
  */
 
 /**
- * Shows a two line string with two special characters that moves left
- * to right on a loop.  Designed to show basic HD44780 functionality.
+ * Example for a 2x16 HD44780 display that shows a two line string with two 
+ * special characters that moves left to right on a loop.  Designed to 
+ * show basic HD44780 functionality.
  */
 #include "HD44780.h"
 #include "freertos/FreeRTOS.h"
 
 void app_main(void)
 {
-    HD44780_FOUR_BIT_BUS bus = { 18, 19, 21, 22, 16, 17 }; 
+    HD44780_FOUR_BIT_BUS bus = { 2, 16, 18, 19, 21, 22, 16, 17 }; 
 
     HD44780_initFourBitBus(&bus);
 

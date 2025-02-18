@@ -13,6 +13,8 @@
 #include "rom/ets_sys.h"
 #include "HD44780.h"
 
+int rows;
+int columns;
 HD44780_DISPLAY_MODE displayMode;
 HD44780_FOUR_BIT_BUS *fourBus;
 HD44780_EIGHT_BIT_BUS *eightBus;
@@ -35,6 +37,8 @@ static uint32_t INSTRUCTION_DELAY_US = 70;
 void HD44780_initFourBitBus(HD44780_FOUR_BIT_BUS *fourBitBus) {
     displayMode = HD44780_FOUR_BIT_MODE;
     fourBus = fourBitBus;
+    rows = fourBitBus->rows;
+    columns = fourBitBus->columns;
 
     gpio_set_direction(fourBitBus->D4, GPIO_MODE_OUTPUT);
     gpio_set_direction(fourBitBus->D5, GPIO_MODE_OUTPUT);
@@ -58,6 +62,8 @@ void HD44780_initFourBitBus(HD44780_FOUR_BIT_BUS *fourBitBus) {
 void HD44780_initEightBitBus(HD44780_EIGHT_BIT_BUS *eightBitBus) {
     displayMode = HD44780_EIGHT_BIT_MODE;
     eightBus = eightBitBus;
+    rows = eightBitBus->rows;
+    columns = eightBitBus->columns;
 
     // Set all pins on bus to OUTPUTs
     gpio_set_direction(eightBitBus->D0, GPIO_MODE_OUTPUT);
@@ -155,14 +161,13 @@ void HD44780_shiftDispRight() {
 
 /**
  * Sets the position of the cursor based on the param column (x) and row (y)
- * NOTE: This currently only works for common 16x2 displays
  * 
  * @param x column to set cursor to as an integer
  * @param y row to set cursor to as an integer
  */
 void HD44780_setCursorPos(int x, int y) {
     // If position is out of range for display, just return
-    if (x < 0 || y < 0 || x > HD44780_COLS || y > HD44780_ROWS) {
+    if (x < 0 || y < 0 || x > columns || y > rows) {
         return;
     }
 
@@ -171,6 +176,10 @@ void HD44780_setCursorPos(int x, int y) {
         HD44780_SendInstruction(HD44780_SET_POSITION | (HD44780_ROW1_START + x));
     } else if (y == 1) {
         HD44780_SendInstruction(HD44780_SET_POSITION | (HD44780_ROW2_START + x));
+    } else if (y == 2) {
+        HD44780_SendInstruction(HD44780_SET_POSITION | (HD44780_ROW3_START + x));
+    } else if (y == 3) {
+        HD44780_SendInstruction(HD44780_SET_POSITION | (HD44780_ROW4_START + x));
     }
 }
 

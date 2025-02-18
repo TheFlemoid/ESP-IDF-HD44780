@@ -1,7 +1,7 @@
 # ESP-IDF HD44780
 
 <H2>ESP-32 drivers for common Hitachi HD44780 character LCD displays.</H2>
-Can be dropped into any ESP-IDF project as an IDF components.  Currently supports two row HD44780 based displays.
+Can be dropped into any ESP-IDF project as an IDF component.  Currently supports both two and four row HD44780 based displays.
 
 &nbsp; 
 
@@ -58,32 +58,36 @@ HD44780 displays are driven in one of three modes:
 Once you've determined the display mode you want, you need to make a struct specific to that mode to initialize the 
 display.  For 4-bit mode create an HD44780_FOUR_BIT_BUS or, for 8-bit mode, create an HD44780_EIGHT_BIT_BUS struct.  
 The structs are as follows:
-* 4-bit mode: HD44870_FOUR_BIT_BUS which has six parameters
-  * 1: GPIO pin number connected to D4
-  * 2: GPIO pin number connected to D5
-  * 3: GPIO pin number connected to D6
-  * 4: GPIO pin number connected to D7
-  * 5: GPIO pin number connected to RS
-  * 6: GPIO pin number connected to E
+* 4-bit mode: HD44870_FOUR_BIT_BUS which has eight parameters
+  * 1: Integer number of rows that the display has (typically either 1, 2, or 4)
+  * 2: Integer number of columns that the display has (typically either 16 or 20)
+  * 3: GPIO pin number connected to D4
+  * 4: GPIO pin number connected to D5
+  * 5: GPIO pin number connected to D6
+  * 6: GPIO pin number connected to D7
+  * 7: GPIO pin number connected to RS
+  * 8: GPIO pin number connected to E
 * Example: 
 ```
-HD44780_FOUR_BIT_BUS fourBitBus = { 18, 19, 21, 22, 16, 17 }; 
+HD44780_FOUR_BIT_BUS fourBitBus = { 2, 16, 18, 19, 21, 22, 16, 17 }; 
 ```
 
-* 8-bit mode: HD44870_EIGHT_BIT_BUS which has ten parameters
-  * 1: GPIO pin number connected to D0
-  * 2: GPIO pin number connected to D1
-  * 3: GPIO pin number connected to D2
-  * 4: GPIO pin number connected to D3
-  * 5: GPIO pin number connected to D4
-  * 6: GPIO pin number connected to D5
-  * 7: GPIO pin number connected to D6
-  * 8: GPIO pin number connected to D7
-  * 9: GPIO pin number connected to RS
-  * 10: GPIO pin number connected to E
+* 8-bit mode: HD44870_EIGHT_BIT_BUS which has twelve parameters
+  * 1: Integer number of rows that the display has (typically either 1, 2, or 4)
+  * 2: Integer number of columns that the display has (typically either 16 or 20)
+  * 3: GPIO pin number connected to D0
+  * 4: GPIO pin number connected to D1
+  * 5: GPIO pin number connected to D2
+  * 6: GPIO pin number connected to D3
+  * 7: GPIO pin number connected to D4
+  * 8: GPIO pin number connected to D5
+  * 9: GPIO pin number connected to D6
+  * 10: GPIO pin number connected to D7
+  * 11: GPIO pin number connected to RS
+  * 12: GPIO pin number connected to E
 * Example: 
 ```
-HD44780_EIGHT_BIT_BUS eightBitBus = { 18, 19, 21, 22, 23, 25, 26, 27, 16, 17 }; 
+HD44780_EIGHT_BIT_BUS eightBitBus = { 2, 16, 18, 19, 21, 22, 23, 25, 26, 27, 16, 17 }; 
 ```
 
 Once you've made the struct that corresponds to your desired mode of operation, call either HD44780_initFourBitBus or
