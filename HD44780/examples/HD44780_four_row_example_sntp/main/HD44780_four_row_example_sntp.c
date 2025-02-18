@@ -42,7 +42,7 @@
 #endif
 
 // Function predefinitions
-static void obtain_time(void);
+static void obtain_time();
 void updateTimeAfterInit();
 void setupDisplay(HD44780_FOUR_BIT_BUS *bus);
 void updateDisplay(struct tm *timeinfo);
@@ -50,8 +50,7 @@ void updateDisplay(struct tm *timeinfo);
 /**
  * Application main
  */
-void app_main(void)
-{
+void app_main() {
     HD44780_FOUR_BIT_BUS bus = { 4, 20, 18, 19, 21, 22, 16, 17 };
     setupDisplay(&bus);
 
@@ -82,8 +81,7 @@ void app_main(void)
  * connects to an SNTP server to get the current time, and sets the systems
  * internal real time clock (RTC) accordingly.
  */
-static void obtain_time(void)
-{
+static void obtain_time() {
     ESP_ERROR_CHECK( nvs_flash_init() );
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK( esp_event_loop_create_default() );
