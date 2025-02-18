@@ -115,7 +115,7 @@ void HD44780_dispOn();
 #define HD44780_FONT_5X10       0x40
 
 // Constants for calculations
-// TODO: FLD 03FEB25 - Currently only support common 2x16 LCDs, as that's all I have
+// TODO: FLD 17FEB25 - Currently only support common 2x16 LCDs, as that's all I have
 //       to test with. If, later, we want to support more varied displays, will have
 //       to have a way of defining which one you're using, and pad out the methods
 //       using the constants below (setCursor, shift, etc).

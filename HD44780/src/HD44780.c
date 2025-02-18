@@ -249,8 +249,12 @@ void HD44780_InitDisplay() {
     HD44780_Send4BitStartInstruction(HD44780_INIT_SEQ);
     vTaskDelay(TWENTY_MILLI_DELAY);
 
-    // TODO: FLD 01FEB25 - Assuming here that all displays are two row and 5x8
-    //                     add support for one row and 5x10 displays later.
+    // TODO: FLD 01FEB25 - Currently don't support one row or 5x10 displays, as I don't
+    //                     have any to test with nor do I have an explicit need
+    //                     for that.  The HD44780_TWO_ROWS constant here is 
+    //                     slightly misleading, this does support common 4 row
+    //                     displays, it's just that internally there are multiple
+    //                     controllers in the display that are all set to two row mode.
     if (displayMode == HD44780_FOUR_BIT_MODE) {
         HD44780_Send4BitStartInstruction(HD44780_FOUR_BIT_MODE);
         HD44780_SendInstruction(HD44780_FOUR_BIT_MODE | HD44780_TWO_ROWS | 
