@@ -71,6 +71,7 @@ void app_main() {
     tzset();
 
     while (true) {
+        // 500ms delay so that we always update on the second, due to Nyquist
         vTaskDelay(500 / portTICK_PERIOD_MS);
         updateTimeAfterInit();
     }
