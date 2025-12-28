@@ -37,7 +37,7 @@ Initializing the HD44780 controller is a little tricky, as the datasheet is some
 obtuse about the process and there are two modes that the controller
 can be initialized to (4-bit and 8-bit mode).  This is abstracted away when using this library,
 but I thought it may be an interesting thing to write about here.  Outside of the 
-[HD44780 datasheet](resources/HD44780.pdf) (pdf warning) I got the information to initialize 
+[HD44780 datasheet](./HD44780.pdf) (pdf warning) I got the information to initialize 
 the display from an [Alfred State College blog](https://web.alfredstate.edu/faculty/weimandn/lcd/lcd_initialization/lcd_initialization_index.html).
 
 HD44780 init steps for either 8 or 4 bit mode are as follows:
