@@ -7,3 +7,5 @@ sdkconfig.old
 .vscode/
 .devcontainer/
 dependencies.lock
+.clangd
+**/.cache/**
